@@ -5,7 +5,7 @@ tuk = load_image('TUK_GROUND.png')
 character = load_image('sonic_sheet.png')
 
 def handle_events():
-    global running, dir_x, dir_y
+    global running, dir_x, dir_y, look_right
 
     events = get_events()
     for event in events:
@@ -14,8 +14,10 @@ def handle_events():
         elif event.type == SDL_KEYDOWN:
             if event.key == SDLK_RIGHT:
                 dir_x += 1
+                look_right = True
             elif event.key == SDLK_LEFT:
                 dir_x -= 1
+                look_right = False
             elif event.key == SDLK_UP:
                 dir_y += 1
             elif event.key == SDLK_DOWN:
@@ -40,11 +42,15 @@ dir_y = 0
 run = [140, 150, 145, 155]
 run_bottom = [610, 750, 900, 1045]
 i = 0
+look_right = True
 
 while running:
     clear_canvas()
     tuk.draw_to_origin(0, 0, 800, 600)
-    character.clip_draw(run_bottom[i], 170, run[i], 190, x, y, 70, 70)
+    if look_right:
+        character.clip_draw(run_bottom[i], 170, run[i], 190, x, y, 70, 70)
+    else:
+        character.clip_composite_draw(run_bottom[i], 170, run[i], 190, 0, 'h', x, y, 70, 70)
     i = (i + 1) % 4
     update_canvas()
     handle_events()
