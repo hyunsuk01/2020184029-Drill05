@@ -5,7 +5,7 @@ tuk = load_image('TUK_GROUND.png')
 character = load_image('sonic_sheet.png')
 
 def handle_events():
-    global running, dir_x, dir_y, look_right
+    global running, dir_x, dir_y, look_right, shift_pressed
 
     events = get_events()
     for event in events:
@@ -22,6 +22,8 @@ def handle_events():
                 dir_y += 1
             elif event.key == SDLK_DOWN:
                 dir_y -= 1
+            elif event.key == SDLK_LSHIFT:
+                shift_pressed = True
             elif event.key == SDLK_ESCAPE:
                 running = False
         elif event.type == SDL_KEYUP:
@@ -33,6 +35,8 @@ def handle_events():
                 dir_y -= 1
             elif event.key == SDLK_DOWN:
                 dir_y += 1
+            elif event.key == SDLK_LSHIFT:
+                shift_pressed = False
 
 running = True
 x = 240
@@ -41,21 +45,36 @@ dir_x = 0
 dir_y = 0
 run = [140, 150, 145, 155]
 run_bottom = [610, 750, 900, 1045]
+roll = [160, 130, 140, 135, 145]
+roll_bottom = [0, 160, 290, 430, 565]
 i = 0
+j = 0
 look_right = True
+shift_pressed = False
 
 while running:
     clear_canvas()
     tuk.draw_to_origin(0, 0, 800, 600)
-    if look_right:
-        character.clip_draw(run_bottom[i], 170, run[i], 190, x, y, 70, 70)
+    if shift_pressed:
+        if look_right:
+            character.clip_draw(roll_bottom[j], 0, roll[j], 160, x, y, 70, 70)
+        else:
+            character.clip_composite_draw(roll_bottom[j], 0, roll[j], 160, 0, 'h', x, y, 70, 70)
     else:
-        character.clip_composite_draw(run_bottom[i], 170, run[i], 190, 0, 'h', x, y, 70, 70)
+        if look_right:
+            character.clip_draw(run_bottom[i], 170, run[i], 190, x, y, 70, 70)
+        else:
+            character.clip_composite_draw(run_bottom[i], 170, run[i], 190, 0, 'h', x, y, 70, 70)
     i = (i + 1) % 4
+    j = (j + 1) % 5
     update_canvas()
     handle_events()
-    x += dir_x * 10
-    y += dir_y * 10
+    if shift_pressed:
+        x += dir_x * 25
+        y += dir_y * 25
+    else:
+        x += dir_x * 10
+        y += dir_y * 10
 
 
     if x < 35:
